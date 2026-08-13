@@ -1488,17 +1488,34 @@ class RsMsgs {
     return response['info']['gxs_ids'];
   }
 
+}
+
+// ----------------------------------------------------------------------------
+// Chat service
+// ----------------------------------------------------------------------------
+
+class RsChats {
   static Future<String> getCustomStateString(
     String peerId,
     AuthToken authToken,
   ) async {
-    final mParams = {
-      'peer_id': peerId,
-    };
-    const mPath = '/rsChats/getCustomStateString';
-    final response =
-        await rsApiCall(mPath, authToken: authToken, params: mParams);
-    return response['retval'] ?? '';
+    final response = await rsApiCall(
+      '/rsChats/getCustomStateString',
+      authToken: authToken,
+      params: {'peer_id': peerId},
+    );
+    return response['retval']?.toString() ?? '';
+  }
+
+  static Future<void> setCustomStateString(
+    String statusString,
+    AuthToken authToken,
+  ) async {
+    await rsApiCall(
+      '/rsChats/setCustomStateString',
+      authToken: authToken,
+      params: {'status_string': statusString},
+    );
   }
 }
 
