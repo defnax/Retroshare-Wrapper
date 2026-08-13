@@ -1111,6 +1111,54 @@ class RsStatus {
 }
 
 // ----------------------------------------------------------------------------
+// Service permissions
+// ----------------------------------------------------------------------------
+
+class RsServiceControl {
+  static Future<Map<String, dynamic>> getServicePermissions(
+    int serviceId,
+    AuthToken authToken, {
+    http.Client? client,
+  }) async {
+    final response = await rsApiCall(
+      '/rsServiceControl/getServicePermissions',
+      authToken: authToken,
+      params: {'serviceId': serviceId},
+      client: client,
+    );
+    final permissions = response['permissions'];
+    if (permissions is Map) {
+      return Map<String, dynamic>.from(permissions);
+    }
+    throw Exception('Service permissions missing from response');
+  }
+
+  static Future<bool> setServiceEnabled(
+    int serviceId,
+    bool enabled,
+    AuthToken authToken, {
+    http.Client? client,
+  }) async {
+    final permissions =
+        await getServicePermissions(serviceId, authToken, client: client);
+    permissions['mDefaultAllowed'] = enabled;
+    if (enabled) {
+      permissions['mPeersDenied'] = <String>[];
+    } else {
+      permissions['mPeersAllowed'] = <String>[];
+    }
+    final response = await rsApiCall(
+      '/rsServiceControl/updateServicePermissions',
+      authToken: authToken,
+      params: {'serviceId': serviceId, 'permissions': permissions},
+      client: client,
+    );
+    final retval = response['retval'];
+    return retval == true || retval == 1;
+  }
+}
+
+// ----------------------------------------------------------------------------
 // Broadcast Discovery
 // ----------------------------------------------------------------------------
 
