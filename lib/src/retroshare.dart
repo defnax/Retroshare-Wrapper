@@ -1495,6 +1495,14 @@ class RsMsgs {
 // ----------------------------------------------------------------------------
 
 class RsChats {
+  static Future<String> getOwnCustomStateString(AuthToken authToken) async {
+    final response = await rsApiCall(
+      '/rsChats/getOwnCustomStateString',
+      authToken: authToken,
+    );
+    return response['retval']?.toString() ?? '';
+  }
+
   static Future<String> getCustomStateString(
     String peerId,
     AuthToken authToken,
