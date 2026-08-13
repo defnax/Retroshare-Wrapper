@@ -1036,6 +1036,38 @@ class RsPeers {
 // ----------------------------------------------------------------------------
 
 class RsStatus {
+  static Future<int> getOwnStatus(
+    AuthToken authToken, {
+    http.Client? client,
+  }) async {
+    final response = await rsApiCall(
+      '/rsStatus/getOwnStatus',
+      authToken: authToken,
+      client: client,
+    );
+    final info = response['statusInfo'] ?? response['status_info'];
+    if (info is Map) {
+      return ((info['status'] ?? info['mStatus']) as num?)?.toInt() ?? 0;
+    }
+    return 0;
+  }
+
+  static Future<bool> sendStatus(
+    int status,
+    AuthToken authToken, {
+    String peerId = '',
+    http.Client? client,
+  }) async {
+    final response = await rsApiCall(
+      '/rsStatus/sendStatus',
+      authToken: authToken,
+      params: {'id': peerId, 'status': status},
+      client: client,
+    );
+    final retval = response['retval'];
+    return retval == true || retval == 1;
+  }
+
   /// Get status list for all connected peers.
   ///
   /// Returns a map of peerId -> status value:
